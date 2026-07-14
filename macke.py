@@ -8,7 +8,11 @@ import re
 ###############################################################################
 
 # definirajte URL glavne strani bolhe za oglase z mačkami
-frontpage_url = 'https://www.worldfootball.net/competition/co91/england-premier-league/se74714/2024-2025/all-matches/'
+sezone = [
+    {'url': 'https://www.11v11.com/competitions/premier-league/2021/matches/', 'html_ime': 'sezona_2021.html'},
+    {'url': 'https://www.11v11.com/competitions/premier-league/2020/matches/', 'html_ime': 'sezona_2020.html'},
+
+]
 # mapa, v katero bomo shranili podatke
 directory = 'podatki'
 # ime datoteke v katero bomo shranili glavno stran
@@ -59,9 +63,11 @@ def save_string_to_file(text, directory, filename):
 def save_frontpage(page, directory, filename):
     """Funkcija shrani vsebino spletne strani na naslovu "page" v datoteko
     "directory"/"filename"."""
-    tekst = download_url_to_string(page)
-    if tekst is not None:
-        save_string_to_file(tekst, directory, filename)
+    text = download_url_to_string(page)
+    if text is not None:
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+        save_string_to_file(text, directory, filename)
     else:
         print("Podatki niso prenešeni.")
 
@@ -78,61 +84,33 @@ def read_file_to_string(directory, filename):
         return file.read()
 
 
-# Definirajte funkcijo, ki sprejme niz, ki predstavlja vsebino spletne strani,
-# in ga razdeli na dele, kjer vsak del predstavlja en oglas. To storite s
-# pomočjo regularnih izrazov, ki označujejo začetek in konec posameznega
-# oglasa. Funkcija naj vrne seznam nizov.
-
-
-def page_to_ads(page_content):
-    """Funkcija poišče posamezne oglase, ki se nahajajo v spletni strani in
-    vrne seznam oglasov."""
-    # .+? zagotovi, da ujame do prvega konca article in ne gre do zadnjega
-    vzorec = r"<article.+?href=\"/macke.+?</article>"
-    #flags... isce cez vec vrstic, ne sam eno!
-    return re.findall(vzorec, page_content, flags=re.DOTALL)
-
-
-# Definirajte funkcijo, ki sprejme niz, ki predstavlja oglas, in izlušči
-# podatke o imenu, lokaciji, datumu objave in ceni v oglasu.
-
-
-def get_dict_from_ad_block(block):
-    """Funkcija iz niza za posamezen oglasni blok izlušči podatke o imenu, ceni
-    in opisu ter vrne slovar, ki vsebuje ustrezne podatke."""
-    ime_vzorec = r'<h3 class="entity-title".+?<span>(.+?)<.span>'
-    cena_vzorec = r'<strong.+?>(.+?)<.strong>'
-    datum_vzorec = r'<time.+?>(.+?)<.time>'
-    try:
-        ime = re.search(ime_vzorec, block).group(1)
-        cena = re.search(cena_vzorec, block).group(1)
-        datum = re.search(datum_vzorec, block).group(1)
-    except AttributeError:
-        print('Napačna struktura oglasa')
-        return None
-
-    return {'ime': ime, 'cena': cena, 'datum': datum}
 
 
 # Definirajte funkcijo, ki sprejme ime in lokacijo datoteke, ki vsebuje
 # besedilo spletne strani, in vrne seznam slovarjev, ki vsebujejo podatke o
 # vseh oglasih strani.
+import re
 
-
-def ads_from_file(filename, directory):
+def ads_from_file(directory, filename):
     """Funkcija prebere podatke v datoteki "directory"/"filename" in jih
     pretvori (razčleni) v pripadajoč seznam slovarjev za vsak oglas posebej."""
     #preberemo podatke iz datoteke
     text = read_file_to_string(directory, filename)
+    vzorec = r'(\d{2} \w{3} \d{4})([A-Za-z &]+?)(\d+):(\d+)([A-Za-z &]+?)(?=\d{2} \w{3} \d{4}|$)'
+    zadetki = re.findall(vzorec, text)
     #izluščimo oglase
-    ads = page_to_ads(text)
     #vsak oglas pretvorimo v slovar podatkov
     data = []
-    for ad in ads:
-        #dobimo podatke
-        ad_data = get_dict_from_ad_block(ad)
-        if ad_data is not None:
-            data.append(ad_data)
+    for zadetek in zadetki:
+        datum, domaca, goli_domaca, goli_gost, gost = zadetek
+        tekma = {
+            'datum': datum,
+            'domaca_ekipa' : domaca.strip(),
+            'gostujoca_ekipa': gost.strip(),
+            'goli_domaca': int(goli_domaca),
+            'goli_gost': int(goli_gost)
+        }
+        data.append(tekma)
     return data
 
 
@@ -188,19 +166,25 @@ def main(redownload=True, reparse=True):
     2. Lokalno html datoteko pretvori v lepšo predstavitev podatkov
     3. Podatke shrani v csv datoteko
     """
+    vse_tekme = []
+
+    for sezona in sezone:
+        path_html_file = os.path.join(directory, sezona['html_ime'])
+
+        if not os.path.exists(path_html_file):
+          save_frontpage(sezona['url'], directory, sezona['html_ime'])
+        
     # Najprej v lokalno datoteko shranimo glavno stran
-    path_frontpage_file = os.path.join(directory, frontpage_filename)
     #če še ne obstaja jo prenesemo, drgač ni treba
     #s tem se izognemo captcha al pa kej takega
-    if not os.path.exists(path_frontpage_file):
-        save_frontpage(frontpage_url, directory, frontpage_filename)
 
     # Iz lokalne (html) datoteke preberemo podatke
     # Podatke preberemo v lepšo obliko (seznam slovarjev)
-    data = ads_from_file(directory, frontpage_filename)
+    tekme = ads_from_file(directory, sezona['html_ime'])
+    vse_tekme.extend(tekme)
 
     # Podatke shranimo v csv datoteko
-    write_cat_ads_to_csv(data, directory, csv_filename)
+    write_cat_ads_to_csv(vse_tekme, directory, csv_filename)
 
     # Dodatno: S pomočjo parametrov funkcije main omogoči nadzor, ali se
     # celotna spletna stran ob vsakem zagon prenese (četudi že obstaja)

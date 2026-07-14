@@ -1,0 +1,1477 @@
+ <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+
+	<title>11v11 league table generator</title>
+
+	<!-- team-/page-specific metadata -->
+	<meta name="keywords" 	 content="football transfers, football player transfers, transfers, 11v11 transfer directory" />
+	<meta name="description" content="League tables for any day in football history - going back to the start of the Football League." />
+
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="viewport" content="width=992" />
+
+	<link rel="stylesheet" href="https://www.11v11.com/api/css/team.css" media="screen, projection" type="text/css" />
+	<link rel="stylesheet" href="/generic/css/page-searchbar.css?v=1" media="screen, projection" type="text/css" />
+	<!--[if lte IE 7]>
+	<link rel="stylesheet" href="https://www.11v11.com/api/css/ie7-and-lower.css" />
+	<![endif]-->
+	<!--[if IE 8]>
+	<link rel="stylesheet" href="https://www.11v11.com/api/css/ie8.css" />
+	<![endif]-->
+	<!-- google search stylesheet link (not valid xhtml in body element) -->
+	<link rel="stylesheet" href="https://www.google.com/cse/style/look/default.css" type="text/css" />
+
+
+
+	<script type="fc7f04f9f0440b7f8423101a-text/javascript">
+
+		function resetFilters() {
+
+			document.getElementById('day').selectedIndex = 0;
+			document.getElementById('month').selectedIndex = 0;
+			document.getElementById('year').value = '';
+			document.getElementById('competition').selectedIndex = 0;
+			document.getElementById('home-or-away').selectedIndex = 0;
+
+		}
+
+
+		function doFilters() {
+
+			var day 	= document.getElementById('day').options[document.getElementById('day').selectedIndex].value;
+			var month 	= document.getElementById('month').options[document.getElementById('month').selectedIndex].value;
+			var year 	= document.getElementById('year').value;
+			var comp 	= document.getElementById('competition').options[document.getElementById('competition').selectedIndex].text;
+
+			// competition must be present
+			if (comp == '') {
+				alert('Please select a competition.');
+				return;
+			}
+
+			// year must be present
+			if (year == '') {
+				alert('Please enter a year.');
+				return;
+			}
+
+			// if day AND month null assume end of season
+			// PROB DON'T NEED TO DO THIS - CAN USE SEASON ALONE (OR IDEALLY SEASON END DATE) - BUT EASIER FOR NOW...
+			//if (day == '') day = '31';
+			//if (month == '') month = 'july';
+
+			// if day AND month null assume end of season
+			if ((day == '') && ( month == '')) {
+				date = year;
+			} else {
+
+				// if day OR month null, message user
+				if (day == '' || month == '') {
+					alert('Please select both month and day, or neither for end of season table.');
+					return;
+				}
+				date = day + '-' + month + '-' + year;
+			}
+
+			// SHOULD CHECK FOR VALID DATE HERE!!!
+
+			// adjust comp name for URL
+			comp = comp.replace(/ /g, '-');
+			comp = comp.replace('(', '');
+			comp = comp.replace(')', '');
+			comp = comp.toLowerCase();
+
+			// set home or away var if necessary
+			if (document.getElementById('home-or-away').options[document.getElementById('home-or-away').selectedIndex].value != 'both') {
+				var homeOrAway = document.getElementById('home-or-away').options[document.getElementById('home-or-away').selectedIndex].value + '/';
+			} else {
+				var homeOrAway = '';
+			}
+
+			window.location = 'https://www.11v11.com/league-tables/' + comp + "/" + date + '/' + homeOrAway;
+		}
+
+	</script>
+
+	<script type="fc7f04f9f0440b7f8423101a-text/javascript" src="/generic/js/libraries/jquery/jquery-1.7.2.min.js"></script>
+	<script type="fc7f04f9f0440b7f8423101a-text/javascript" src="/generic/js/libraries/jquery/jquery.metadata.js"></script>
+	<script type="fc7f04f9f0440b7f8423101a-text/javascript" src="/generic/js/libraries/jquery/jquery.tablesorter.min.js"></script>
+	<script type="fc7f04f9f0440b7f8423101a-text/javascript" src="/generic/js/11v11.js?v=2"></script>
+
+
+	<style type="text/css">
+	h3
+	{
+		font-weight: normal;
+	}
+
+	div.columns1
+	{
+		border: 0px solid red;
+		max-width: 740px ! important;width: 100%;
+	}
+
+	div#pageContent
+	{
+		padding-top: 10px ! important;
+	}
+	thead th
+	{
+		border-right: 1px solid #fff ! important;
+	}
+	tbody tr.even td
+	{
+		background-color: #dddddd;
+	}
+	</style>
+
+
+
+	<script type="fc7f04f9f0440b7f8423101a-text/javascript">
+
+		var rowIndex = 0;
+		function doRowNumer() {
+			rowIndex++;
+			document.write(rowIndex);
+		}
+
+		function showLeagueInfo() {
+			document.getElementById('league-info').style.display = 'block';
+			return false;
+		}
+
+		function hideLeagueInfo() {
+			document.getElementById('league-info').style.display = 'none';
+			return false;
+		}
+
+	</script>
+
+<!-- added 2022-08-15 -->
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+<!-- added 2024-10-24 -->
+<!-- InMobi Choice. Consent Manager Tag v3.0 (for TCF 2.2) -->
+<script type="fc7f04f9f0440b7f8423101a-text/javascript" async=true>
+(function() {
+  var host = window.location.hostname;
+  var element = document.createElement('script');
+  var firstScript = document.getElementsByTagName('script')[0];
+  var url = 'https://cmp.inmobi.com'
+    .concat('/choice/', 'fdN-682n4AbqH', '/', host, '/choice.js?tag_version=V3');
+  var uspTries = 0;
+  var uspTriesLimit = 3;
+  element.async = true;
+  element.type = 'text/javascript';
+  element.src = url;
+
+  firstScript.parentNode.insertBefore(element, firstScript);
+
+  function makeStub() {
+    var TCF_LOCATOR_NAME = '__tcfapiLocator';
+    var queue = [];
+    var win = window;
+    var cmpFrame;
+
+    function addFrame() {
+      var doc = win.document;
+      var otherCMP = !!(win.frames[TCF_LOCATOR_NAME]);
+
+      if (!otherCMP) {
+        if (doc.body) {
+          var iframe = doc.createElement('iframe');
+
+          iframe.style.cssText = 'display:none';
+          iframe.name = TCF_LOCATOR_NAME;
+          doc.body.appendChild(iframe);
+        } else {
+          setTimeout(addFrame, 5);
+        }
+      }
+      return !otherCMP;
+    }
+
+    function tcfAPIHandler() {
+      var gdprApplies;
+      var args = arguments;
+
+      if (!args.length) {
+        return queue;
+      } else if (args[0] === 'setGdprApplies') {
+        if (
+          args.length > 3 &&
+          args[2] === 2 &&
+          typeof args[3] === 'boolean'
+        ) {
+          gdprApplies = args[3];
+          if (typeof args[2] === 'function') {
+            args[2]('set', true);
+          }
+        }
+      } else if (args[0] === 'ping') {
+        var retr = {
+          gdprApplies: gdprApplies,
+          cmpLoaded: false,
+          cmpStatus: 'stub'
+        };
+
+        if (typeof args[2] === 'function') {
+          args[2](retr);
+        }
+      } else {
+        if(args[0] === 'init' && typeof args[3] === 'object') {
+          args[3] = Object.assign(args[3], { tag_version: 'V3' });
+        }
+        queue.push(args);
+      }
+    }
+
+    function postMessageEventHandler(event) {
+      var msgIsString = typeof event.data === 'string';
+      var json = {};
+
+      try {
+        if (msgIsString) {
+          json = JSON.parse(event.data);
+        } else {
+          json = event.data;
+        }
+      } catch (ignore) {}
+
+      var payload = json.__tcfapiCall;
+
+      if (payload) {
+        window.__tcfapi(
+          payload.command,
+          payload.version,
+          function(retValue, success) {
+            var returnMsg = {
+              __tcfapiReturn: {
+                returnValue: retValue,
+                success: success,
+                callId: payload.callId
+              }
+            };
+            if (msgIsString) {
+              returnMsg = JSON.stringify(returnMsg);
+            }
+            if (event && event.source && event.source.postMessage) {
+              event.source.postMessage(returnMsg, '*');
+            }
+          },
+          payload.parameter
+        );
+      }
+    }
+
+    while (win) {
+      try {
+        if (win.frames[TCF_LOCATOR_NAME]) {
+          cmpFrame = win;
+          break;
+        }
+      } catch (ignore) {}
+
+      if (win === window.top) {
+        break;
+      }
+      win = win.parent;
+    }
+    if (!cmpFrame) {
+      addFrame();
+      win.__tcfapi = tcfAPIHandler;
+      win.addEventListener('message', postMessageEventHandler, false);
+    }
+  };
+
+  makeStub();
+
+  function makeGppStub() {
+    const CMP_ID = 10;
+    const SUPPORTED_APIS = [
+      '2:tcfeuv2',
+      '6:uspv1',
+      '7:usnatv1',
+      '8:usca',
+      '9:usvav1',
+      '10:uscov1',
+      '11:usutv1',
+      '12:usctv1'
+    ];
+
+    window.__gpp_addFrame = function (n) {
+      if (!window.frames[n]) {
+        if (document.body) {
+          var i = document.createElement("iframe");
+          i.style.cssText = "display:none";
+          i.name = n;
+          document.body.appendChild(i);
+        } else {
+          window.setTimeout(window.__gpp_addFrame, 10, n);
+        }
+      }
+    };
+    window.__gpp_stub = function () {
+      var b = arguments;
+      __gpp.queue = __gpp.queue || [];
+      __gpp.events = __gpp.events || [];
+
+      if (!b.length || (b.length == 1 && b[0] == "queue")) {
+        return __gpp.queue;
+      }
+
+      if (b.length == 1 && b[0] == "events") {
+        return __gpp.events;
+      }
+
+      var cmd = b[0];
+      var clb = b.length > 1 ? b[1] : null;
+      var par = b.length > 2 ? b[2] : null;
+      if (cmd === "ping") {
+        clb(
+          {
+            gppVersion: "1.1", // must be “Version.Subversion”, current: “1.1”
+            cmpStatus: "stub", // possible values: stub, loading, loaded, error
+            cmpDisplayStatus: "hidden", // possible values: hidden, visible, disabled
+            signalStatus: "not ready", // possible values: not ready, ready
+            supportedAPIs: SUPPORTED_APIS, // list of supported APIs
+            cmpId: CMP_ID, // IAB assigned CMP ID, may be 0 during stub/loading
+            sectionList: [],
+            applicableSections: [-1],
+            gppString: "",
+            parsedSections: {},
+          },
+          true
+        );
+      } else if (cmd === "addEventListener") {
+        if (!("lastId" in __gpp)) {
+          __gpp.lastId = 0;
+        }
+        __gpp.lastId++;
+        var lnr = __gpp.lastId;
+        __gpp.events.push({
+          id: lnr,
+          callback: clb,
+          parameter: par,
+        });
+        clb(
+          {
+            eventName: "listenerRegistered",
+            listenerId: lnr, // Registered ID of the listener
+            data: true, // positive signal
+            pingData: {
+              gppVersion: "1.1", // must be “Version.Subversion”, current: “1.1”
+              cmpStatus: "stub", // possible values: stub, loading, loaded, error
+              cmpDisplayStatus: "hidden", // possible values: hidden, visible, disabled
+              signalStatus: "not ready", // possible values: not ready, ready
+              supportedAPIs: SUPPORTED_APIS, // list of supported APIs
+              cmpId: CMP_ID, // list of supported APIs
+              sectionList: [],
+              applicableSections: [-1],
+              gppString: "",
+              parsedSections: {},
+            },
+          },
+          true
+        );
+      } else if (cmd === "removeEventListener") {
+        var success = false;
+        for (var i = 0; i < __gpp.events.length; i++) {
+          if (__gpp.events[i].id == par) {
+            __gpp.events.splice(i, 1);
+            success = true;
+            break;
+          }
+        }
+        clb(
+          {
+            eventName: "listenerRemoved",
+            listenerId: par, // Registered ID of the listener
+            data: success, // status info
+            pingData: {
+              gppVersion: "1.1", // must be “Version.Subversion”, current: “1.1”
+              cmpStatus: "stub", // possible values: stub, loading, loaded, error
+              cmpDisplayStatus: "hidden", // possible values: hidden, visible, disabled
+              signalStatus: "not ready", // possible values: not ready, ready
+              supportedAPIs: SUPPORTED_APIS, // list of supported APIs
+              cmpId: CMP_ID, // CMP ID
+              sectionList: [],
+              applicableSections: [-1],
+              gppString: "",
+              parsedSections: {},
+            },
+          },
+          true
+        );
+      } else if (cmd === "hasSection") {
+        clb(false, true);
+      } else if (cmd === "getSection" || cmd === "getField") {
+        clb(null, true);
+      }
+      //queue all other commands
+      else {
+        __gpp.queue.push([].slice.apply(b));
+      }
+    };
+    window.__gpp_msghandler = function (event) {
+      var msgIsString = typeof event.data === "string";
+      try {
+        var json = msgIsString ? JSON.parse(event.data) : event.data;
+      } catch (e) {
+        var json = null;
+      }
+      if (typeof json === "object" && json !== null && "__gppCall" in json) {
+        var i = json.__gppCall;
+        window.__gpp(
+          i.command,
+          function (retValue, success) {
+            var returnMsg = {
+              __gppReturn: {
+                returnValue: retValue,
+                success: success,
+                callId: i.callId,
+              },
+            };
+            event.source.postMessage(msgIsString ? JSON.stringify(returnMsg) : returnMsg, "*");
+          },
+          "parameter" in i ? i.parameter : null,
+          "version" in i ? i.version : "1.1"
+        );
+      }
+    };
+    if (!("__gpp" in window) || typeof window.__gpp !== "function") {
+      window.__gpp = window.__gpp_stub;
+      window.addEventListener("message", window.__gpp_msghandler, false);
+      window.__gpp_addFrame("__gppLocator");
+    }
+  };
+
+  makeGppStub();
+
+  var uspStubFunction = function() {
+    var arg = arguments;
+    if (typeof window.__uspapi !== uspStubFunction) {
+      setTimeout(function() {
+        if (typeof window.__uspapi !== 'undefined') {
+          window.__uspapi.apply(window.__uspapi, arg);
+        }
+      }, 500);
+    }
+  };
+
+  var checkIfUspIsReady = function() {
+    uspTries++;
+    if (window.__uspapi === uspStubFunction && uspTries < uspTriesLimit) {
+      console.warn('USP is not accessible');
+    } else {
+      clearInterval(uspInterval);
+    }
+  };
+
+  if (typeof window.__uspapi === 'undefined') {
+    window.__uspapi = uspStubFunction;
+    var uspInterval = setInterval(checkIfUspIsReady, 6000);
+  }
+})();
+</script>
+<!-- End InMobi Choice. Consent Manager Tag v3.0 (for TCF 2.2) -->
+
+<script data-ad-client="ca-pub-5094636359934159" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js" type="fc7f04f9f0440b7f8423101a-text/javascript"></script>
+
+<!-- Google Tag Manager update on 29-06-2023 -->
+<script type="fc7f04f9f0440b7f8423101a-text/javascript">(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-NLFVR54');</script>
+<!-- End Google Tag Manager -->
+<!-- Google Tag Manager (noscript) update on 29-06-2023-->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NLFVR54"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+<script src="https://jsc.mgid.com/site/887337.js" async type="fc7f04f9f0440b7f8423101a-text/javascript"></script>
+
+<!-- ahmed - 2023-07-25 -->
+<script data-cfasync="false" src="https://ads.totalsports.org/11v11-ads.js"></script>
+
+
+</head>
+<body>
+
+
+<div id="pageContainer">
+
+	<div id="pageHeader">
+
+		<a href="/" class="logo" title="11v11.com - the home of football statistics and history"><img src="/generic/graphics/logos/11v11-logo-98x93.gif" width="65" height="62" alt="11v11 logo" /></a>
+		<button class="toggle-menu">
+			<img src="/generic/graphics/menu.svg" alt="">
+		</button>
+		<div id="vbMenu">
+			<ul>
+				<li><a href="/">Home</a>
+				</li><!--<li><a href="/forum/">Forum</a>
+				</li>--><li><a href="/blog/">Blog</a>
+				</li><li><a href="/world-player-ranking/" title="World Player Ranking">World Player Ranking</a>
+				</li><li><a href="/premier-league/">Premier League</a>
+				</li><li><a href="/football-league/">Football League</a>
+				</li><li class="selected"><a href="/league-tables/">League tables</a>
+				</li><li><a href="/internationals/">Internationals</a>
+				</li><li><a href="/competitions/">Competitions</a>
+		    	</li><li><a href="/history/">History</a>
+		       </li><li><a href="/contact/">Contact</a>
+			</li>
+			</ul>
+			<div id="vbSubmenu">
+				
+			</div><!-- end div#vbSubmenu -->
+		</div><!-- end div#vbMenu -->
+
+	</div><!-- end #pageHeader -->
+
+
+	<div id="page-searchbar" class="search-bar">
+
+	<!-- For ajax search functionality-->
+<script type="fc7f04f9f0440b7f8423101a-text/javascript">		
+	jQuery('#q').keyup(function(){
+		var param = jQuery(this).val();
+		var paramby = jQuery('select[name=s]').val();
+		jQuery.ajax({
+		url: "https://www.11v11.com/searchresult.php?s=" + paramby + "&q=" + param,
+		success: function(response){
+			jQuery("#google-search-results").html(response); 
+			setTimeout(() => {					
+			jQuery('#gsc-i-id1').val(param);
+			jQuery('.gsc-search-button.gsc-search-button-v2').trigger('click');
+			}, 700);
+		}
+		});
+	});
+		
+	function closeDropdown(){jQuery('#google-search-results').html('');}
+			
+</script>
+<div id="google-search-results"></div> 
+<!-- For ajax search functionality-->
+
+<!-- For ajax db search functionality-->
+<div class="searchbar-outer">
+				<div class="row">
+					<div class="col-sm-50">
+						<div class="quick-search">
+						<label>Quick search:(Please type at least three letters)</label>
+						<div class="form-field">
+						<input type="search" id="search-player" placeholder="Type player surname" />
+						<input type="search" id="search-team" placeholder="Type team" />
+						</div>
+						</div>
+						<div id="ajax-player-search-results"></div> 
+						<div id="ajax-team-search-results"></div> 
+					</div>
+					<div class="col-sm-50">
+						<div class="search-headtohead">
+						<label>Quick search head to head:</label>
+						<form method="POST"> 
+							<div class="form-field" id="form-field">
+							</div>
+						</form>
+						<div id="ajax-headtohead-search-results"></div> 
+						</div>
+						</div>
+					</div>
+				</div>
+                </div>
+			<script type="fc7f04f9f0440b7f8423101a-text/javascript">
+				jQuery.ajax({
+					 type: 'POST',
+					url: "https://www.11v11.com/generate-team-dropdown.php",
+					success: function(response) {
+						jQuery("#form-field").html(response);
+					}
+				});
+
+
+
+			jQuery('#search-player').keyup(function() {
+				var player = jQuery(this).val();
+				if(player.length>= 3)
+				{
+					jQuery.ajax({
+						url: "https://www.11v11.com//search-result-ajax.php?player=" + player,
+						success: function(response){
+							jQuery("#ajax-player-search-results").html(response); 	
+						}
+					});
+				}
+			});
+			jQuery('#search-team').keyup(function(){
+				var team = jQuery(this).val();
+		
+				if(team.length>= 3)
+				{
+					jQuery.ajax({
+						url: "https://www.11v11.com/search-result-ajax.php?team=" + team,
+						success: function(response){
+							jQuery("#ajax-team-search-results").html(response); 	
+						}
+					});
+				}
+			});
+			function closeDropdown(){
+				jQuery('#ajax-player-search-results').html('');
+				jQuery('#ajax-team-search-results').html('');
+				jQuery('#ajax-headtohead-search-results').html('');
+				
+			}
+			function FetchHeadtohead() {
+				hth =  jQuery('#headtohead option:selected').val();
+				vhth = jQuery('#vsheadtohead option:selected').val();
+				
+				jQuery.ajax({
+					url: "https://www.11v11.com/search-result-ajax.php?headtohead=" + hth + "&vsheadtohead=" + vhth,
+					success: function(response) {
+						jQuery("#ajax-headtohead-search-results").html(response);
+					}
+				});
+			}
+			
+			</script>
+
+<!-- For ajax db search functionality-->
+
+
+
+
+<!-- Ahmed - 2021-06-30 -->
+<div id='div-BB'  style="text-align: center; padding: 5px 0 5px 0;"></div>
+
+	<div id="pageBody">
+
+		
+		<p class="banner"></p>
+		
+
+
+
+<div id="pageContent" class="leagueTable">
+
+	<h1>Historic league table generator</h1>
+
+	<p>Choose any day in Football League or Premier League history to see the league table as it stood at the end of that day's play.</p>
+	<p>Dates after the end of a season will return the end of season table for the most recently completed season.</p>
+
+	<a href="/" onclick="if (!window.__cfRLUnblockHandlers) return false; return showLeagueInfo();" class="hide-league-info" data-cf-modified-fc7f04f9f0440b7f8423101a-="">League &amp; table info</a>
+	<p class="guidance">Enter year only for end of season table.</p>
+
+	<div id="filters">
+
+		<form>
+
+
+			<fieldset id="date">
+
+				<label><span>Date</span></label>
+
+					<select id="day">
+						<option></option>
+						<option >01</option>
+						<option >02</option>
+						<option >03</option>
+						<option >04</option>
+						<option >05</option>
+						<option >06</option>
+						<option >07</option>
+						<option >08</option>
+						<option >09</option>
+						<option >10</option>
+						<option >11</option>
+						<option >12</option>
+						<option >13</option>
+						<option >14</option>
+						<option >15</option>
+						<option >16</option>
+						<option >17</option>
+						<option >18</option>
+						<option >19</option>
+						<option >20</option>
+						<option >21</option>
+						<option >22</option>
+						<option >23</option>
+						<option >24</option>
+						<option >25</option>
+						<option >26</option>
+						<option >27</option>
+						<option >28</option>
+						<option >29</option>
+						<option >30</option>
+						<option selected>31</option>
+					</select>
+					<select id="month">
+						<option></option>
+						<option  value="january">Jan</option>
+						<option  value="february">Feb</option>
+						<option  value="march">Mar</option>
+						<option  value="april">Apr</option>
+						<option selected value="may">May</option>
+						<option  value="june">Jun</option>
+						<option  value="july">Jul</option>
+						<option  value="august">Aug</option>
+						<option  value="september">Sep</option>
+						<option  value="october">Oct</option>
+						<option  value="november">Nov</option>
+						<option  value="december">Dec</option>
+					</select>
+
+					<!--<input id="year" type="text" maxlength="4" value="2026" />-->
+
+					<select id="year"><option></option><option selected="selected">2026</option><option>2025</option><option>2024</option><option>2023</option><option>2022</option><option>2021</option><option>2020</option><option>2019</option><option>2018</option><option>2017</option><option>2016</option><option>2015</option><option>2014</option><option>2013</option><option>2012</option><option>2011</option><option>2010</option><option>2009</option><option>2008</option><option>2007</option><option>2006</option><option>2005</option><option>2004</option><option>2003</option><option>2002</option><option>2001</option><option>2000</option><option>1999</option><option>1998</option><option>1997</option><option>1996</option><option>1995</option><option>1994</option><option>1993</option><option>1992</option><option>1991</option><option>1990</option><option>1989</option><option>1988</option><option>1987</option><option>1986</option><option>1985</option><option>1984</option><option>1983</option><option>1982</option><option>1981</option><option>1980</option><option>1979</option><option>1978</option><option>1977</option><option>1976</option><option>1975</option><option>1974</option><option>1973</option><option>1972</option><option>1971</option><option>1970</option><option>1969</option><option>1968</option><option>1967</option><option>1966</option><option>1965</option><option>1964</option><option>1963</option><option>1962</option><option>1961</option><option>1960</option><option>1959</option><option>1958</option><option>1957</option><option>1956</option><option>1955</option><option>1954</option><option>1953</option><option>1952</option><option>1951</option><option>1950</option><option>1949</option><option>1948</option><option>1947</option><option>1946</option><option>1945</option><option>1944</option><option>1943</option><option>1942</option><option>1941</option><option>1940</option><option>1939</option><option>1938</option><option>1937</option><option>1936</option><option>1935</option><option>1934</option><option>1933</option><option>1932</option><option>1931</option><option>1930</option><option>1929</option><option>1928</option><option>1927</option><option>1926</option><option>1925</option><option>1924</option><option>1923</option><option>1922</option><option>1921</option><option>1920</option><option>1919</option><option>1918</option><option>1917</option><option>1916</option><option>1915</option><option>1914</option><option>1913</option><option>1912</option><option>1911</option><option>1910</option><option>1909</option><option>1908</option><option>1907</option><option>1906</option><option>1905</option><option>1904</option><option>1903</option><option>1902</option><option>1901</option><option>1900</option><option>1899</option><option>1898</option><option>1897</option><option>1896</option><option>1895</option><option>1894</option><option>1893</option><option>1892</option><option>1891</option><option>1890</option><option>1889</option><option>1888</option></select>
+
+			</fieldset>
+
+			<fieldset id="comp">
+
+				<label><span>Competition:</span>
+
+					<select id="competition">
+					<option></option><option value="1" selected="selected">Premier League</option><option value="196">League Championship</option><option value="197">League One</option><option value="198">League Two</option><option value="22">League Division 1</option><option value="21">League Division 2</option><option value="23">League Division 3</option><option value="200">League Division One</option><option value="201">League Division Two</option><option value="202">League Division Three</option><option value="66">League Division Four</option><option value="203">Division Three (North)</option><option value="204">Division Three (South)</option>
+					</select>
+
+				</label>
+
+					<select id="home-or-away">
+						<option value="both">Home and away</option>
+						<option  value="home">Home</option>
+						<option  value="away">Away</option>
+					</select>
+			</fieldset>
+
+			<fieldset class="controls">
+
+				<a href="#" onclick="if (!window.__cfRLUnblockHandlers) return false; doFilters();return false;" data-cf-modified-fc7f04f9f0440b7f8423101a-="">Show table</a>
+				<a href="#" onclick="if (!window.__cfRLUnblockHandlers) return false; resetFilters();return false;" data-cf-modified-fc7f04f9f0440b7f8423101a-="">Reset</a>
+				<a href="/league-tables/">Leagues</a>
+
+			</fieldset>
+
+		</form>
+
+
+	</div>
+
+	<!-- googleadsense skyscraper -->
+	<div class="wide-skyscraper googleAdSense">
+
+</div>
+
+
+	<div class="column columns1">
+
+	<!-- league table output -->
+
+
+
+		<!-- ouput error if present... -->
+		
+
+
+		<!-- ... ELSE output league table  - not quite...!!! -->
+		
+
+			<h2>
+				Premier League  end of season table for 2025-26 season
+				
+			</h2>
+			<div class="table-responsive">
+			<table class="sortable" id="table-league" width="100%">
+			<thead>
+			<tr>
+				<th title="position" class="{sorter: 'numberx'}">Pos</th><!-- why will this not sort descending??? -->
+				<th title="team">Team</th>
+				<th title="games played">Pld</th>
+				<th title="won">W</th>
+				<th title="drawn">D</th>
+				<th title="lost">L</th>
+				<th title="goals for">GF</th>
+				<th title="goals against">GA</th>
+				
+				<th title="goal difference">GD</th>
+				<th title="points">Pts</th>
+			</tr>
+			</thead>
+			<tbody>
+
+			
+			<tr>
+				<td><script type="fc7f04f9f0440b7f8423101a-text/javascript">doRowNumer();</script></td>
+				<td><a href="/teams/arsenal/">Arsenal</a></td>
+				<td>38</td>
+				<td>26</td>
+				<td>7</td>
+				<td>5</td>
+				<td>71</td>
+				<td>27</td>
+				
+				<td><span class="positive">44</span></td>
+				<td>85</td>
+			</tr>
+			
+			<tr>
+				<td><script type="fc7f04f9f0440b7f8423101a-text/javascript">doRowNumer();</script></td>
+				<td><a href="/teams/manchester-city/">Manchester City</a></td>
+				<td>38</td>
+				<td>23</td>
+				<td>9</td>
+				<td>6</td>
+				<td>77</td>
+				<td>35</td>
+				
+				<td><span class="positive">42</span></td>
+				<td>78</td>
+			</tr>
+			
+			<tr>
+				<td><script type="fc7f04f9f0440b7f8423101a-text/javascript">doRowNumer();</script></td>
+				<td><a href="/teams/manchester-united/">Manchester United</a></td>
+				<td>38</td>
+				<td>20</td>
+				<td>11</td>
+				<td>7</td>
+				<td>69</td>
+				<td>50</td>
+				
+				<td><span class="positive">19</span></td>
+				<td>71</td>
+			</tr>
+			
+			<tr>
+				<td><script type="fc7f04f9f0440b7f8423101a-text/javascript">doRowNumer();</script></td>
+				<td><a href="/teams/aston-villa/">Aston Villa</a></td>
+				<td>38</td>
+				<td>19</td>
+				<td>8</td>
+				<td>11</td>
+				<td>56</td>
+				<td>49</td>
+				
+				<td><span class="positive">7</span></td>
+				<td>65</td>
+			</tr>
+			
+			<tr>
+				<td><script type="fc7f04f9f0440b7f8423101a-text/javascript">doRowNumer();</script></td>
+				<td><a href="/teams/liverpool/">Liverpool</a></td>
+				<td>38</td>
+				<td>17</td>
+				<td>9</td>
+				<td>12</td>
+				<td>63</td>
+				<td>53</td>
+				
+				<td><span class="positive">10</span></td>
+				<td>60</td>
+			</tr>
+			
+			<tr>
+				<td><script type="fc7f04f9f0440b7f8423101a-text/javascript">doRowNumer();</script></td>
+				<td><a href="/teams/afc-bournemouth/">AFC Bournemouth</a></td>
+				<td>38</td>
+				<td>13</td>
+				<td>18</td>
+				<td>7</td>
+				<td>58</td>
+				<td>54</td>
+				
+				<td><span class="positive">4</span></td>
+				<td>57</td>
+			</tr>
+			
+			<tr>
+				<td><script type="fc7f04f9f0440b7f8423101a-text/javascript">doRowNumer();</script></td>
+				<td><a href="/teams/sunderland/">Sunderland</a></td>
+				<td>38</td>
+				<td>14</td>
+				<td>12</td>
+				<td>12</td>
+				<td>42</td>
+				<td>48</td>
+				
+				<td><span class="negative">-6</span></td>
+				<td>54</td>
+			</tr>
+			
+			<tr>
+				<td><script type="fc7f04f9f0440b7f8423101a-text/javascript">doRowNumer();</script></td>
+				<td><a href="/teams/brighton-and-hove-albion/">Brighton and Hove Albion</a></td>
+				<td>38</td>
+				<td>14</td>
+				<td>11</td>
+				<td>13</td>
+				<td>52</td>
+				<td>46</td>
+				
+				<td><span class="positive">6</span></td>
+				<td>53</td>
+			</tr>
+			
+			<tr>
+				<td><script type="fc7f04f9f0440b7f8423101a-text/javascript">doRowNumer();</script></td>
+				<td><a href="/teams/brentford/">Brentford</a></td>
+				<td>38</td>
+				<td>14</td>
+				<td>11</td>
+				<td>13</td>
+				<td>55</td>
+				<td>52</td>
+				
+				<td><span class="positive">3</span></td>
+				<td>53</td>
+			</tr>
+			
+			<tr>
+				<td><script type="fc7f04f9f0440b7f8423101a-text/javascript">doRowNumer();</script></td>
+				<td><a href="/teams/chelsea/">Chelsea</a></td>
+				<td>38</td>
+				<td>14</td>
+				<td>10</td>
+				<td>14</td>
+				<td>58</td>
+				<td>52</td>
+				
+				<td><span class="positive">6</span></td>
+				<td>52</td>
+			</tr>
+			
+			<tr>
+				<td><script type="fc7f04f9f0440b7f8423101a-text/javascript">doRowNumer();</script></td>
+				<td><a href="/teams/fulham/">Fulham</a></td>
+				<td>38</td>
+				<td>15</td>
+				<td>7</td>
+				<td>16</td>
+				<td>47</td>
+				<td>51</td>
+				
+				<td><span class="negative">-4</span></td>
+				<td>52</td>
+			</tr>
+			
+			<tr>
+				<td><script type="fc7f04f9f0440b7f8423101a-text/javascript">doRowNumer();</script></td>
+				<td><a href="/teams/newcastle-united/">Newcastle United</a></td>
+				<td>38</td>
+				<td>14</td>
+				<td>7</td>
+				<td>17</td>
+				<td>53</td>
+				<td>55</td>
+				
+				<td><span class="negative">-2</span></td>
+				<td>49</td>
+			</tr>
+			
+			<tr>
+				<td><script type="fc7f04f9f0440b7f8423101a-text/javascript">doRowNumer();</script></td>
+				<td><a href="/teams/everton/">Everton</a></td>
+				<td>38</td>
+				<td>13</td>
+				<td>10</td>
+				<td>15</td>
+				<td>47</td>
+				<td>50</td>
+				
+				<td><span class="negative">-3</span></td>
+				<td>49</td>
+			</tr>
+			
+			<tr>
+				<td><script type="fc7f04f9f0440b7f8423101a-text/javascript">doRowNumer();</script></td>
+				<td><a href="/teams/leeds-united/">Leeds United</a></td>
+				<td>38</td>
+				<td>11</td>
+				<td>14</td>
+				<td>13</td>
+				<td>49</td>
+				<td>56</td>
+				
+				<td><span class="negative">-7</span></td>
+				<td>47</td>
+			</tr>
+			
+			<tr>
+				<td><script type="fc7f04f9f0440b7f8423101a-text/javascript">doRowNumer();</script></td>
+				<td><a href="/teams/crystal-palace/">Crystal Palace</a></td>
+				<td>38</td>
+				<td>11</td>
+				<td>12</td>
+				<td>15</td>
+				<td>41</td>
+				<td>51</td>
+				
+				<td><span class="negative">-10</span></td>
+				<td>45</td>
+			</tr>
+			
+			<tr>
+				<td><script type="fc7f04f9f0440b7f8423101a-text/javascript">doRowNumer();</script></td>
+				<td><a href="/teams/nottingham-forest/">Nottingham Forest</a></td>
+				<td>38</td>
+				<td>11</td>
+				<td>11</td>
+				<td>16</td>
+				<td>48</td>
+				<td>51</td>
+				
+				<td><span class="negative">-3</span></td>
+				<td>44</td>
+			</tr>
+			
+			<tr>
+				<td><script type="fc7f04f9f0440b7f8423101a-text/javascript">doRowNumer();</script></td>
+				<td><a href="/teams/tottenham-hotspur/">Tottenham Hotspur</a></td>
+				<td>38</td>
+				<td>10</td>
+				<td>11</td>
+				<td>17</td>
+				<td>48</td>
+				<td>57</td>
+				
+				<td><span class="negative">-9</span></td>
+				<td>41</td>
+			</tr>
+			
+			<tr>
+				<td><script type="fc7f04f9f0440b7f8423101a-text/javascript">doRowNumer();</script></td>
+				<td><a href="/teams/west-ham-united/">West Ham United</a></td>
+				<td>38</td>
+				<td>10</td>
+				<td>9</td>
+				<td>19</td>
+				<td>46</td>
+				<td>65</td>
+				
+				<td><span class="negative">-19</span></td>
+				<td>39</td>
+			</tr>
+			
+			<tr>
+				<td><script type="fc7f04f9f0440b7f8423101a-text/javascript">doRowNumer();</script></td>
+				<td><a href="/teams/burnley/">Burnley</a></td>
+				<td>38</td>
+				<td>4</td>
+				<td>10</td>
+				<td>24</td>
+				<td>38</td>
+				<td>75</td>
+				
+				<td><span class="negative">-37</span></td>
+				<td>22</td>
+			</tr>
+			
+			<tr>
+				<td><script type="fc7f04f9f0440b7f8423101a-text/javascript">doRowNumer();</script></td>
+				<td><a href="/teams/wolverhampton-wanderers/">Wolverhampton Wanderers</a></td>
+				<td>38</td>
+				<td>3</td>
+				<td>11</td>
+				<td>24</td>
+				<td>27</td>
+				<td>68</td>
+				
+				<td><span class="negative">-41</span></td>
+				<td>20</td>
+			</tr>
+			
+
+			</tbody>
+			</table>
+		</div>
+		<div class="table-responsive">
+			<table id="table-exceptions">
+
+			
+
+			
+
+
+
+			
+			</table>
+
+		</div>
+
+
+			
+
+
+		
+
+	
+
+
+
+
+
+
+
+
+
+	
+
+
+	</div><!-- end column -->
+
+
+
+</div><!-- end #pageContent -->
+</div><!-- end #pageBody -->
+
+<!-- googleadsense -->
+<!--<div class="leaderboard googleAdSense" style="text-align:center;">-->
+<!-- /div>-->
+
+
+
+
+<!-- ahmed - 2023-05-->
+<div id='div-LB'  style="text-align: center; padding: 5px 0 5px 0;"></div>
+
+<div id="pageFooter">
+	<div class="copyright">
+		&copy; AFS Enterprises Limited
+		<script type="fc7f04f9f0440b7f8423101a-text/javascript">
+			var right_now = new Date();
+			document.write(right_now.getFullYear());
+		</script>
+		All Rights Reserved : <a href="/terms-and-conditions-and-privacy-policy/">Terms &amp; conditions / Privacy policy</a>
+	</div>
+</div><!-- end #pageFooter -->
+<script type="fc7f04f9f0440b7f8423101a-text/javascript" src="/generic/js/libraries/jquery/jquery-1.7.2.min.js"></script>
+<script type="fc7f04f9f0440b7f8423101a-text/javascript">
+  jQuery('.toggle-menu').click(function(){
+  jQuery('#vbMenu').toggleClass('active');		
+  })	
+  </script>
+
+<!-- ahmed - 2023-05-->
+<div id='div-1x1'></div> 
+<!-- ad unit - 2023-11 -->
+<!-- 
+<div style="position:fixed;left:1%;bottom:1%;z-index:99999999;"><div data-pid="ajbvazskvmgr" data-t="i" data-mt="b" data-render-delay="0" data-iframe-class="" data-iframe-style="" data-pu-fallback="1" w="300" h="250"></div></div>
+<script id="ajbvazskvmgr" type="text/javascript"> (function (document, window) { document.addEventListener('DOMContentLoaded', function (event) { let a = document.createElement("script"); a.type = 'text/javascript'; a.async = true; a.src = "https://data.gblcdn.com/data/pastoclockp.js?aid=2d06b79673bf17c7b3c8&pubid=b52d5320-d029-11ec-8f3f-eb43d6a3152e&pid=ajbvazskvmgr&renderD=0&limitT=0&limitH=24&parent=body&t=i&mt=b"; document.body.appendChild(a); document.getElementById('ajbvazskvmgr').remove(); }); }) (document, window); </script>
+<script id="ajbvazskvmgr-pd" type="text/javascript"> (function (document, window) { document.addEventListener('DOMContentLoaded', function (event) { let a = document.createElement("script"); a.type = 'text/javascript'; a.async = true; a.src = "https://data.gblcdn.com/data/pastoclockps.js?aid=e8d3823216e9d19cc007&pubid=b52d5320-d029-11ec-8f3f-eb43d6a3152e&pid=ajbvazskvmgr&renderD=0&limitT=0&limitH=24&parent=body&t=pd&mt=b"; document.body.appendChild(a); document.getElementById('ajbvazskvmgr-pd').remove(); }); }) (document, window); </script>
+-->
+
+
+</div><!-- end pageContainer -->
+
+
+
+
+<!-- league table info popup -->
+<div id="league-info">
+
+	<a href="/" onclick="if (!window.__cfRLUnblockHandlers) return false; return hideLeagueInfo();" class="hide-league-info" data-cf-modified-fc7f04f9f0440b7f8423101a-="">Close</a>
+	<h1>League table information</h1>
+
+<div id="league-info-inner">
+
+
+
+	<p>Historical variations in league table calculations, and treatment in the 11v11 league table generator.</p>
+	<a href="#historic" class="normal">Historic varations at a glance</a>
+
+	<h2>Points for a win</h2>
+
+	<p>Until 1981 English Football Association (FA) leagues awarded 2 points for a win.</p>
+	<p>Starting with the 1981-82 season, 3 points were awarded to encourage more competitive play.</p>
+
+
+	<h2>Discriminating point ties</h2>
+
+	<p>Teams tied on points are disciminated by goal difference or goal average (depending on FA rules in force at the time), then by goals scored.</p>
+
+		<h3>Goal average</h3>
+
+		<p>From seasons 1896-97 to 1995-96, FA leagues used goal average (GAve) to resolve point ties.</p>
+		<p>Goal "average" (actually a ratio, not an average) is the result of dividing goals for by goals against (GF/GA) <!--[truncated/rounded how?]--> to three decimal places.</p>
+
+	<div class="indent">
+		<h3>Goal average and zeros</h3>
+		<p>Where GF &gt; 0 and GA = 0 then GAve = infinity (&infin;), which (perhaps anomalously) gives a team with 10 goals for and 1 against a worse GAve (10/1 = 10) than a team with 1 for and 0 against (1/0 = &infin;).</p>
+		<p>When GF = 0 and GA &gt; 0, mathematically the value of GF/GA is undefined.</p>
+		<p>When GF = 0 GA = 0, mathematically the value of GF/GA is indeterminate.</p>
+
+		<h3>11v11 treatment of zeros in goal average calculations</h3>
+		<p>It is unclear how the Football Leagues treated division of or by 0.</p>
+		<p>For pragmatic reasons, and in the absence of additional information,  11v11 assumes:</p>
+		<ul>
+			<li>When GF = 0 and GA &gt; 0, GAve = -GA (favours teams who have conceded fewer goals)</li>
+			<li>When GF = 0 and GA = 0, GAve = 1 (consistent with GF = <i>n</i> and GA = <i>n</i>)</li>
+		</ul>
+		<p>Additionally:</p>
+		<ul>
+			<li>When GF &gt; 0 and GA = 0, GAve of &infin; is represented as 100 (cannot sort on &infin;)</li>
+		</ul>
+	</div>
+
+
+		<h3>Goal difference</h3>
+
+		<p>Goal difference (GD) is the difference between goals scored and conceded (GF-GA), and replaced goal average in FA leagues starting with the 1976-77 season.</p>
+
+		<h3>When teams remain tied</h3>
+
+		<p>For some leagues, if ties are not resolved according to the rules in place at the time, relative position is calculated by considering only those matches the tied teams played against each other, applying the same rules to resolve ties.  Effectively these matches are treated as a sort of "mini-league".</p>
+		<p>Alternatively position may be assigned alphabetically by team name.</p>
+
+	<h2>Playoffs</h2>
+
+	<p>League  playoffs were introduced for the 1987 season.</p>
+	<p>For the first 2 seasons they were played between teams in adjacent leagues, but from the 1989 season they were played within each league.</p>
+
+	<h2>Additional information</h2>
+
+		<h3>Resolving points ties prior to 1896-97</h3>
+
+		<p>There is some uncertainly regarding how  points ties were resolved prior to the 1896-97 season. It may have been goal average, or possibly this situation had not previously arisen.</p>
+		<p>The 11v11 league table generator uses GAve + GF in the absence of any definitive information to the contrary. [if was never an issue, this not needed]</p>
+
+		<h3>Calculating position before the league ends using goal average</h3>
+
+		<p>Using goal average makes tie resolution almost impossible for early-season tables.</p>
+		<p>This is because teams are most likely to tie when only a few games have been played, but will not usually have played the teams they tie with at that stage in the season, making it impossible to use their mutual encounters to resovle the tie.</p>
+
+<!--
+		<p>Therefore, the 11v11 league table generator does not attempt to resolve ties using mini-leagues until half-way through trhe season when each team can be exected to have played each other team at least once.  [BUT will it ever be needed after this point??? CHECK!!!]</p>
+-->
+		<p>It is noteworthy that until SSSS league tables were not published until a few weeks into the season, presumably to avoid the problems of resolving early-season points + GAve + GF ties when so few points or goals had been scored.</p>
+		<p>Users should note these points so that they are able to interpret early- and mid-season tables appropriately.
+
+	<h2 id="historic">Historic league details at a glance</h2>
+
+	<table cellspacing="0" id="table-league-parameters">
+	<thead>
+	<tr>
+		<th>League</th>
+		<th>Seasons</th>
+		<th>Win points</th>
+		<th>Tie resolution</th>
+		<th>Playoffs</th>
+	</tr>
+	</thead>
+	<tbody class="alternate">
+
+		<tr>
+			<td>Premier League</td>
+			<td>1993 on</td>
+			<td>3</td>
+			<td>GD + GF + team name</td>
+			<td></td>
+		</tr>
+
+		<tr>
+			<td>League Championship</td>
+			<td>2005 on</td>
+			<td>3</td>
+			<td>GD + GF + team name</td>
+			<td>LC</td>
+		</tr>
+
+		<tr>
+			<td>League One</td>
+			<td>2005 on</td>
+			<td>3</td>
+			<td>GD + GF + team name</td>
+			<td>L1</td>
+		</tr>
+
+		<tr>
+			<td>League Two</td>
+			<td>2005 on</td>
+			<td>3</td>
+			<td>GD + GF + team name</td>
+			<td>L2</td>
+		</tr>
+
+		<tr>
+			<td>League Division 1</td>
+			<td>1993-2004</td>
+			<td>3</td>
+			<td>GD + GF + team name</td>
+			<td>LD1</td>
+		</tr>
+
+		<tr>
+			<td>League Division 2</td>
+			<td>1993-2004</td>
+			<td>3</td>
+			<td>GD + GF + team name</td>
+			<td>LD2</td>
+		</tr>
+
+		<tr>
+			<td>League Division 3</td>
+			<td>1993-2004</td>
+			<td>3</td>
+			<td>GD + GF + team name</td>
+			<td>LD3</td>
+		</tr>
+
+		<tr>
+			<td rowspan="5">League Division One</td>
+			<td>1889-1976</td>
+			<td>2</td>
+			<td>GAve + GF, then mini-league</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>1977-1981</td>
+			<td>2</td>
+			<td>GD + GF + team name</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>1982-1986</td>
+			<td>3</td>
+			<td>GD + GF + team name</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>1987-1988</td>
+			<td>3</td>
+			<td>GD + GF + team name</td>
+			<td>LDs One & Two</td>
+		</tr>
+		<tr>
+			<td>1989-1992</td>
+			<td>3</td>
+			<td>GD + GF + team name</td>
+			<td></td>
+		</tr>
+
+		<tr>
+			<td rowspan="5">League Division Two</td>
+			<td>1893-1976</td>
+			<td>2</td>
+			<td>GAve + GF, then mini-league</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>1977-1981</td>
+			<td>2</td>
+			<td>GD + GF + team name</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>1982-1986</td>
+			<td>3</td>
+			<td>GD + GF + team name</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>1987-1988</td>
+			<td>3</td>
+			<td>GD + GF + team name</td>
+			<td>LDs One & Two</td>
+		</tr>
+		<tr>
+			<td>1989-1992</td>
+			<td>3</td>
+			<td>GD + GF + team name</td>
+			<td>LD Two</td>
+		</tr>
+
+		<tr>
+			<td rowspan="5">League Division Three</td>
+			<td>1959-1976</td>
+			<td>2</td>
+			<td>GAve + GF, then mini-league</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>1977-1981</td>
+			<td>2</td>
+			<td>GD + GF + team name</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>1982-1986</td>
+			<td>3</td>
+			<td>GD + GF + team name</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>1987-1988</td>
+			<td>3</td>
+			<td>GD + GF + team name</td>
+			<td>LDs Two & Three</td>
+		</tr>
+		<tr>
+			<td>1989-1992</td>
+			<td>3</td>
+			<td>GD + GF + team name</td>
+			<td>LD Three</td>
+		</tr>
+
+		<tr>
+			<td rowspan="5">League Division Four</td>
+			<td>1959-1976</td>
+			<td>2</td>
+			<td>GAve + GF, then mini-league</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>1977-1981</td>
+			<td>2</td>
+			<td>GD + GF + team name</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>1982-1986</td>
+			<td>3</td>
+			<td>GD + GF + team name</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>1987-1988</td>
+			<td>3</td>
+			<td>GD + GF + team name</td>
+			<td>LDs Three & Four</td>
+		</tr>
+		<tr>
+			<td>1989-1992</td>
+			<td>3</td>
+			<td>GD + GF + team name</td>
+			<td>LD Four</td>
+		</tr>
+
+		<tr>
+			<td>Division Three (North)</td>
+			<td>1922-1958</td>
+			<td>2</td>
+			<td>GAve + GF, then mini-league</td>
+			<td></td>
+		</tr>
+
+		<tr>
+			<td>Division Three (South)</td>
+			<td>1921-1958</td>
+			<td>2</td>
+			<td>GAve + GF, then mini-league</td>
+			<td></td>
+		</tr>
+
+	</tbody>
+	</table>
+
+	<a href="/" onclick="if (!window.__cfRLUnblockHandlers) return false; return hideLeagueInfo();" class="hide-league-info" data-cf-modified-fc7f04f9f0440b7f8423101a-="">Close</a>
+
+</div>
+</div>
+
+
+<script src="/cdn-cgi/scripts/7d0fa10a/cloudflare-static/rocket-loader.min.js" data-cf-settings="fc7f04f9f0440b7f8423101a-|49" defer></script></body>
+</html>
