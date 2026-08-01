@@ -59,11 +59,50 @@ def read_file_to_string(directory, filename):
 def odstrani_html_znacke(html):
     return re.sub(r'<[^>]+>', '', html)
     
+def strelci_tekme_from_url(url):
+    html = download_url_to_string(url)
 
+    if html is None:
+        return {
+            'strelci_domaci': '',
+            'strelci_gostje': ''
+        }
+
+    text = odstrani_html_znacke(html)
+
+    # poiščemo del med "Goals:" in "Cards:"
+    rezultat = re.search(r'Goals:(.*?)Starting lineup:', text, re.S)
+
+    if rezultat is None:
+        return {
+            'strelci_domaci': '',
+            'strelci_gostje': ''
+        }
+
+    goals_text = rezultat.group(1)
+
+    # razdelimo na domače in goste
+    deli = goals_text.split('Goals:')
+    domaci_text = deli[0]
+    gostje_text = deli[1] if len(deli) > 1 else ""
+
+    vzorec_gola = r"([A-ZÀ-Ž][A-Za-zÀ-Ž'.\- ]*?)\s+(\d{1,3}(?:\+\d{1,2})?)\b"
+
+    domaci_goli = re.findall(vzorec_gola, domaci_text)
+    gostje_goli = re.findall(vzorec_gola, gostje_text)
+
+    strelci_domaci = ", ".join(f"{ime.strip()} {minuta}'" for ime, minuta in domaci_goli)
+    strelci_gostje = ", ".join(f"{ime.strip()} {minuta}'" for ime, minuta in gostje_goli)
+
+    return {
+        'strelci_domaci': strelci_domaci,
+        'strelci_gostje': strelci_gostje
+    }
 def process_match(zadetek):
     datum, domaca, match_path, goli_domaca, goli_gost, gost = zadetek
     url = f"https://www.11v11.com{match_path}"
     kartoni = kartoni_from_url(url)
+    strelci = strelci_tekme_from_url(url)
 
     return {
         'datum': datum,
@@ -71,10 +110,14 @@ def process_match(zadetek):
         'gostujoca_ekipa': gost.strip(),
         'goli_domaca': int(goli_domaca),
         'goli_gost': int(goli_gost),
+
         'rumeni_domaci': kartoni['rumeni_domaci'],
         'rumeni_gostje': kartoni['rumeni_gostje'],
         'rdeci_domaci': kartoni['rdeci_domaci'],
-        'rdeci_gostje': kartoni['rdeci_gostje']
+        'rdeci_gostje': kartoni['rdeci_gostje'],
+
+        'strelci_domaci': strelci['strelci_domaci'],
+        'strelci_gostje': strelci['strelci_gostje']
     }
 
 def from_file(directory, filename, sezona):
