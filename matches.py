@@ -1,5 +1,7 @@
 import csv
 import os
+from concurrent.futures import ThreadPoolExecutor, as_completed
+
 import requests
 import re
 
@@ -57,31 +59,43 @@ def read_file_to_string(directory, filename):
 def odstrani_html_znacke(html):
     return re.sub(r'<[^>]+>', '', html)
     
-def from_file(directory,filename):
+
+def process_match(zadetek):
+    datum, domaca, match_path, goli_domaca, goli_gost, gost = zadetek
+    url = f"https://www.11v11.com{match_path}"
+    kartoni = kartoni_from_url(url)
+
+    return {
+        'datum': datum,
+        'domaca_ekipa': domaca.strip(),
+        'gostujoca_ekipa': gost.strip(),
+        'goli_domaca': int(goli_domaca),
+        'goli_gost': int(goli_gost),
+        'rumeni_domaci': kartoni['rumeni_domaci'],
+        'rumeni_gostje': kartoni['rumeni_gostje'],
+        'rdeci_domaci': kartoni['rdeci_domaci'],
+        'rdeci_gostje': kartoni['rdeci_gostje']
+    }
+
+def from_file(directory, filename, sezona):
     html = read_file_to_string(directory, filename)
-    text = re.sub(r'<[^>]+>', '', html)
-    vzorec = r'(\d{2} \w{3} \d{4})([A-Za-z &]+?)(\d+):(\d+)([A-Za-z &]+?)(?=\d{2} \w{3} \d{4}|$)'
-    zadetki = re.findall(vzorec, text)
-    
+
+    vzorec = r'<tr><td>(\d{2} \w{3} \d{4})</td><td class="home">(.*?)</td><td class="score">.*?<a href="(/matches/[^"]+)" title="view match details">(\d+):(\d+)</a></td><td>(.*?)</td>'
+    zadetki = re.findall(vzorec, html, re.S)
+
     data = []
 
-    for zadetek in zadetki:
-        datum, domaca, goli_domaca, goli_gost, gost = zadetek
-        kartoni = kartoni_from_url(url)
-        tekma = {
-            'datum': datum,
-            'domaca_ekipa' : domaca.strip(),
-            'gostujoca_ekipa': gost.strip(),
-            'goli_domaca': int(goli_domaca),
-            'goli_gost': int(goli_gost),
+    with ThreadPoolExecutor(max_workers=8) as executor:
+        futures = [
+            executor.submit(process_match, zadetek)
+            for zadetek in zadetki
+        ]
 
+        for future in as_completed(futures):
+            tekma = future.result()
+            print(tekma)      # Printed immediately when this thread finishes
+            data.append(tekma)
 
-            'rumeni_domaci': kartoni['rumeni_domaci'],
-            'rumeni_gostje': kartoni['rumeni_gostje'],
-            'rdeci_domaci': kartoni['rdeci_domaci'],
-            'rdeci_gostje': kartoni['rdece_gostje']
-        }
-        data.append(tekma)
     return data
 
 
@@ -111,7 +125,12 @@ def kartoni_from_url(url):
     html = download_url_to_string(url)
 
     if html is None:
-        return None
+        return {
+            'rumeni_domaci': 0,
+            'rumeni_gostje': 0,
+            'rdeci_domaci': 0,
+            'rdeci_gostje': 0
+        }
     
     text = odstrani_html_znacke(html)
 
@@ -126,14 +145,20 @@ def kartoni_from_url(url):
             'rdeci_gostje': 0
         }
     
-    cards = rezultat.group(1)
-    ekipe = cards.split('Cards:')
+    cards_text = rezultat.group(1)
+    
+    # Razdelimo na domače in gostujoče kartone
+    # 11v11 običajno ponovi "Cards:" za gostujočo ekipo v besedilu po odstranitvi HTML značk
+    parts = cards_text.split('Cards:')
+    
+    domaci_text = parts[0]
+    gostje_text = parts[1] if len(parts) > 1 else ""
 
     return {
-        'rumeni_domaci': cards[:len(cards)//2].count('Y'),
-        'rumeni_gostje': cards[len(cards)//2:].count('Y'),
-        'rdeci_domaci': cards[:len(cards)//2].count('R'),
-        'rdeci_gostje': cards[len(cards)//2:].count('R')
+        'rumeni_domaci': len(re.findall(r'\bY\b', domaci_text)),
+        'rumeni_gostje': len(re.findall(r'\bY\b', gostje_text)),
+        'rdeci_domaci': len(re.findall(r'\bR\b', domaci_text)),
+        'rdeci_gostje': len(re.findall(r'\bR\b', gostje_text))
     }
     
 
@@ -164,8 +189,8 @@ def main(redownload = True, reparse = True):
         if not os.path.exists(path_html_file):
             save_frontpage(sezona['url'], directory, sezona['html_ime'])
 
-    
-        tekme = from_file(directory,sezona['html_ime'])
+
+        tekme = from_file(directory, sezona['html_ime'], sezona)
         vse_tekme.extend(tekme)
 
 
