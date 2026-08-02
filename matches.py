@@ -58,6 +58,44 @@ def read_file_to_string(directory, filename):
     
 def odstrani_html_znacke(html):
     return re.sub(r'<[^>]+>', '', html)
+
+pozicije_cache = {}  # da vsakega igralca prenesemo samo enkrat, ne za vsak gol/tekmo posebej
+
+def igralci_urls_iz_tekme(html):
+    """Iz surovega HTML-ja ene tekme izlušči {ime_igralca: url} iz sestave in klopi."""
+    vzorec = r'<a href="(/players/[^"]+)">(.*?)</a>'
+    zadetki = re.findall(vzorec, html, re.S)
+
+    slovar = {}
+    for pot, ime_html in zadetki:
+        ime = odstrani_html_znacke(ime_html).strip()
+        url = f"https://www.11v11.com{pot}"
+        slovar[ime] = url
+    return slovar
+
+
+def pozicija_igralca(url):
+    if url in pozicije_cache:
+        return pozicije_cache[url]
+
+    html = download_url_to_string(url)
+    if html is None:
+        pozicije_cache[url] = ''
+        return ''
+
+    text = odstrani_html_znacke(html)
+    idx = text.find('Position')
+    if idx == -1:
+        pozicije_cache[url] = ''
+        return ''
+
+    okno = text[idx:idx + 60]
+    vzorec_pozicije = r'(Goalkeeper|Defender(?:/[A-Za-z ]+)?|Midfielder(?:/[A-Za-z ]+)?|Forward)'
+    rezultat = re.search(vzorec_pozicije, okno)
+
+    pozicija = rezultat.group(1) if rezultat else ''
+    pozicije_cache[url] = pozicija
+    return pozicija
     
 def strelci_tekme_from_url(url):
     html = download_url_to_string(url)
@@ -68,9 +106,10 @@ def strelci_tekme_from_url(url):
             'strelci_gostje': ''
         }
 
+    igralci_urls = igralci_urls_iz_tekme(html)  # imena -> url, iz sestave/klopi te tekme
+
     text = odstrani_html_znacke(html)
 
-    # poiščemo del med "Goals:" in "Cards:"
     rezultat = re.search(r'Goals:(.*?)Starting lineup:', text, re.S)
 
     if rezultat is None:
@@ -81,7 +120,6 @@ def strelci_tekme_from_url(url):
 
     goals_text = rezultat.group(1)
 
-    # razdelimo na domače in goste
     deli = goals_text.split('Goals:')
     domaci_text = deli[0]
     gostje_text = deli[1] if len(deli) > 1 else ""
@@ -91,13 +129,28 @@ def strelci_tekme_from_url(url):
     domaci_goli = re.findall(vzorec_gola, domaci_text)
     gostje_goli = re.findall(vzorec_gola, gostje_text)
 
-    strelci_domaci = ", ".join(f"{ime.strip()} {minuta}'" for ime, minuta in domaci_goli)
-    strelci_gostje = ", ".join(f"{ime.strip()} {minuta}'" for ime, minuta in gostje_goli)
+    def oblikuj(goli):
+        vnosi = []
+        for ime, minuta in goli:
+            ime = ime.strip()
+            url_igralca = igralci_urls.get(ime)
+            pozicija = pozicija_igralca(url_igralca) if url_igralca else ''
+            if pozicija:
+                vnosi.append(f"{ime} ({pozicija}) {minuta}'")
+            else:
+                vnosi.append(f"{ime} {minuta}'")
+        return ", ".join(vnosi)
+
+    strelci_domaci = oblikuj(domaci_goli)
+    strelci_gostje = oblikuj(gostje_goli)
 
     return {
         'strelci_domaci': strelci_domaci,
         'strelci_gostje': strelci_gostje
     }
+
+
+
 def process_match(zadetek):
     datum, domaca, match_path, goli_domaca, goli_gost, gost = zadetek
     url = f"https://www.11v11.com{match_path}"
