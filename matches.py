@@ -168,6 +168,8 @@ def process_match(zadetek):
         'rumeni_gostje': kartoni['rumeni_gostje'],
         'rdeci_domaci': kartoni['rdeci_domaci'],
         'rdeci_gostje': kartoni['rdeci_gostje'],
+        'kartoni_domaci': kartoni['kartoni_domaci'],
+        'kartoni_gostje': kartoni['kartoni_gostje'],
 
         'strelci_domaci': strelci['strelci_domaci'],
         'strelci_gostje': strelci['strelci_gostje']
@@ -217,17 +219,15 @@ def strelci_from_file(directory, filename):
     return data
 
 def kartoni_from_url(url):
-
     html = download_url_to_string(url)
 
     if html is None:
         return {
-            'rumeni_domaci': 0,
-            'rumeni_gostje': 0,
-            'rdeci_domaci': 0,
-            'rdeci_gostje': 0
+            'rumeni_domaci': 0, 'rumeni_gostje': 0,
+            'rdeci_domaci': 0, 'rdeci_gostje': 0,
+            'kartoni_domaci': '', 'kartoni_gostje': ''
         }
-    
+
     text = odstrani_html_znacke(html)
 
     vzorec = r'Cards:(.*?)(?:On the bench|Comments)'
@@ -235,28 +235,33 @@ def kartoni_from_url(url):
 
     if rezultat is None:
         return {
-            'rumeni_domaci': 0,
-            'rumeni_gostje': 0,
-            'rdeci_domaci': 0,
-            'rdeci_gostje': 0
+            'rumeni_domaci': 0, 'rumeni_gostje': 0,
+            'rdeci_domaci': 0, 'rdeci_gostje': 0,
+            'kartoni_domaci': '', 'kartoni_gostje': ''
         }
-    
+
     cards_text = rezultat.group(1)
-    
-    # Razdelimo na domače in gostujoče kartone
-    # 11v11 običajno ponovi "Cards:" za gostujočo ekipo v besedilu po odstranitvi HTML značk
     parts = cards_text.split('Cards:')
-    
     domaci_text = parts[0]
     gostje_text = parts[1] if len(parts) > 1 else ""
+
+    # ime igralca + minuta + tip kartona (Y ali R)
+    vzorec_kartona = r"([A-ZÀ-Ž][A-Za-zÀ-Ž'.\- ]*?)\s+(\d{1,3}(?:\+\d{1,2})?)\s*([YR])\b"
+
+    domaci_kartoni = re.findall(vzorec_kartona, domaci_text)
+    gostje_kartoni = re.findall(vzorec_kartona, gostje_text)
+
+    def oblikuj(kartoni):
+        return ", ".join(f"{ime.strip()} {minuta}' ({tip})" for ime, minuta, tip in kartoni)
 
     return {
         'rumeni_domaci': len(re.findall(r'\bY\b', domaci_text)),
         'rumeni_gostje': len(re.findall(r'\bY\b', gostje_text)),
         'rdeci_domaci': len(re.findall(r'\bR\b', domaci_text)),
-        'rdeci_gostje': len(re.findall(r'\bR\b', gostje_text))
+        'rdeci_gostje': len(re.findall(r'\bR\b', gostje_text)),
+        'kartoni_domaci': oblikuj(domaci_kartoni),
+        'kartoni_gostje': oblikuj(gostje_kartoni)
     }
-    
 
 def write_csv(fieldnames, rows, directory, filename):
     os.makedirs(directory, exist_ok=True)
@@ -271,8 +276,9 @@ def write_csv(fieldnames, rows, directory, filename):
 
 def write_matches_to_csv(ads, directory, filename):
     assert ads and (all(j.keys() == ads[0].keys() for j in ads))
-    fieldnames =sorted(ads[0].keys())
+    fieldnames = sorted(ads[0].keys())
     write_csv(fieldnames, ads, directory, filename)
+
 
 def main(redownload = True, reparse = True):
     vse_tekme = []
