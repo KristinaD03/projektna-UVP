@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.pyc
+
+# Virtualno okolje
+venv/
+.venv/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Preneseni HTML podatki
+podatki/*.html
+
+# Lokalni CSV podatki
+podatki/*.csv
+
+# Sistemske datoteke
+.DS_Store
+Thumbs.db
