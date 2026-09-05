@@ -59,10 +59,10 @@ def read_file_to_string(directory, filename):
 def odstrani_html_znacke(html):
     return re.sub(r'<[^>]+>', '', html)
 
-pozicije_cache = {}  # da vsakega igralca prenesemo samo enkrat, ne za vsak gol/tekmo posebej
+pozicije_cache = {}  
 
 def igralci_urls_iz_tekme(html):
-    """Iz surovega HTML-ja ene tekme izlušči {ime_igralca: url} iz sestave in klopi."""
+
     vzorec = r'<a href="(/players/[^"]+)">(.*?)</a>'
     zadetki = re.findall(vzorec, html, re.S)
 
@@ -106,7 +106,7 @@ def strelci_tekme_from_url(url):
             'strelci_gostje': ''
         }
 
-    igralci_urls = igralci_urls_iz_tekme(html)  # imena -> url, iz sestave/klopi te tekme
+    igralci_urls = igralci_urls_iz_tekme(html)  
 
     text = odstrani_html_znacke(html)
 
@@ -191,15 +191,13 @@ def from_file(directory, filename, sezona):
 
         for future in as_completed(futures):
             tekma = future.result()
-            print(tekma)      # Printed immediately when this thread finishes
+            print(tekma)      
             data.append(tekma)
 
     return data
 
 
 def strelci_from_file(directory, filename):
-    """Funkcija prebere stran s strelci sezone in vrne seznam slovarjev
-    z imenom igralca, ekipo in številom golov."""
     html = read_file_to_string(directory, filename)
     text = odstrani_html_znacke(html)
 
@@ -245,7 +243,7 @@ def kartoni_from_url(url):
     domaci_text = parts[0]
     gostje_text = parts[1] if len(parts) > 1 else ""
 
-    # ime igralca + minuta + tip kartona (Y ali R)
+    
     vzorec_kartona = r"([A-ZÀ-Ž][A-Za-zÀ-Ž'.\- ]*?)\s+(\d{1,3}(?:\+\d{1,2})?)\s*([YR])\b"
 
     domaci_kartoni = re.findall(vzorec_kartona, domaci_text)
@@ -280,45 +278,7 @@ def write_matches_to_csv(ads, directory, filename):
     write_csv(fieldnames, ads, directory, filename)
 
 
-def main(redownload = True, reparse = True):
-    vse_tekme = []
-    vsi_strelci = []
 
-    for sezona in sezone:
-        path_html_file = os.path.join(directory, sezona['html_ime'])
-
-
-        if not os.path.exists(path_html_file):
-            save_frontpage(sezona['url'], directory, sezona['html_ime'])
-
-
-        tekme = from_file(directory, sezona['html_ime'], sezona)
-        vse_tekme.extend(tekme)
-
-
-    write_matches_to_csv(vse_tekme, directory, csv_filename)
-
-
-    for sezona in strelci_url:
-        path_html_file = os.path.join(directory, sezona['html_ime'])
-
-
-        if not os.path.exists(path_html_file):
-            save_frontpage(sezona['url'], directory, sezona['html_ime'])
-
-
-        strelci = strelci_from_file(directory, sezona['html_ime'])
-        vsi_strelci.extend(strelci)
-
-    write_matches_to_csv(vsi_strelci, directory, strelci_csv_filename)
-
-    print(f"Shranjenih {len(vse_tekme)} tekem in {len(vsi_strelci)} strelcev.")
-
-   
-
-
-if __name__ == '__main__':
-    main()
 
 
 
